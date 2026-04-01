@@ -1,8 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
-import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { Role } from "../generated/prisma/enums.js";
 import { env } from "../env.js";
 import { AppError } from "../utils/app-error.js";
+import pkg from 'jsonwebtoken';
+const { JsonWebTokenError, TokenExpiredError } = pkg;
 
 type AuthTokenPayload = {
 	userId: string;
