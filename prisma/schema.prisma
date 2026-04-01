@@ -12,8 +12,47 @@ datasource db {
   provider = "sqlite"
 }
 
-model User { 
-  id    Int     @id @default(autoincrement()) 
-  email String  @unique
-  name  String?
+enum Role {
+  USER
+  ADMIN
+}
+
+enum RecordType {
+  INCOME
+  EXPENSE
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(USER)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  records      FinancialRecord[]
+
+  @@index([createdAt])
+}
+
+model FinancialRecord {
+  id         String      @id @default(uuid())
+  amount     Decimal
+  type       RecordType
+  category   String
+  date       DateTime
+  notes      String?
+
+  createdBy  String
+  user       User        @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  deletedAt  DateTime? 
+
+  @@index([createdAt])
+  @@index([category])
+  @@index([type])
+  @@index([createdBy])
 }
