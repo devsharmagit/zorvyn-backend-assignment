@@ -1,0 +1,61 @@
+import type { Request, Response } from "express";
+import { loginSchema, registerSchema } from "../schemas/auth.schema.js";
+import {
+	authService,
+	DuplicateEmailError,
+	InvalidCredentialsError,
+} from "../services/auth.service.js";
+
+export const authController = {
+	async register(req: Request, res: Response) {
+		const parsed = registerSchema.safeParse(req.body);
+
+		if (!parsed.success) {
+			return res.status(400).json({
+				message: "Validation failed",
+				errors: parsed.error.flatten(),
+			});
+		}
+
+		try {
+			const result = await authService.register(parsed.data);
+			return res.status(201).json(result);
+		} catch (error) {
+			if (error instanceof DuplicateEmailError) {
+				return res.status(409).json({
+					message: error.message,
+				});
+			}
+
+			return res.status(500).json({
+				message: "Internal server error",
+			});
+		}
+	},
+
+	async login(req: Request, res: Response) {
+		const parsed = loginSchema.safeParse(req.body);
+
+		if (!parsed.success) {
+			return res.status(400).json({
+				message: "Validation failed",
+				errors: parsed.error.flatten(),
+			});
+		}
+
+		try {
+			const result = await authService.login(parsed.data);
+			return res.status(200).json(result);
+		} catch (error) {
+			if (error instanceof InvalidCredentialsError) {
+				return res.status(401).json({
+					message: error.message,
+				});
+			}
+
+			return res.status(500).json({
+				message: "Internal server error",
+			});
+		}
+	},
+};
