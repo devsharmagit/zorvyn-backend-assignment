@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import { setupSwagger } from "./config/swagger.js";
 import {
 	globalErrorHandler,
 	notFoundHandler,
@@ -13,6 +14,7 @@ export const app = express();
 
 app.use(cors());
 app.use(express.json());
+setupSwagger(app);
 
 app.use("/auth", authRoutes);
 app.use("/records", recordRoutes);
