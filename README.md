@@ -10,7 +10,6 @@ Backend API for financial record management with authentication, role-based auth
 - SQLite (via `@prisma/adapter-better-sqlite3`)
 - Zod validation
 - JWT auth
-- Swagger (`/api-docs`)
 
 ## Setup
 
@@ -64,20 +63,6 @@ Production build + run:
 
 ```bash
 npm run start
-```
-
-## API Docs (Swagger)
-
-Swagger UI is available at:
-
-```text
-GET /api-docs
-```
-
-Once the app is running locally:
-
-```text
-http://localhost:<PORT>/api-docs
 ```
 
 ## Environment Variables
