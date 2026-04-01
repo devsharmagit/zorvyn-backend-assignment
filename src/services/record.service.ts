@@ -28,6 +28,11 @@ export const recordService = {
 	},
 
 	async getAll(query: GetRecordsQueryInput) {
+		const page = query.page ?? 1;
+		const limit = query.limit ?? 10;
+		const sortBy = query.sortBy ?? "date";
+		const order = query.order ?? "desc";
+
 		const where: Prisma.FinancialRecordWhereInput = {
 			deletedAt: null,
 		};
@@ -51,15 +56,15 @@ export const recordService = {
 			where.date = dateFilter;
 		}
 
-		const skip = (query.page - 1) * query.limit;
+		const skip = (page - 1) * limit;
 		const [items, total] = await Promise.all([
 			recordRepository.findMany({
 				where,
 				orderBy: {
-					[query.sortBy]: query.order,
+					[sortBy]: order,
 				},
 				skip,
-				take: query.limit,
+				take: limit,
 			}),
 			recordRepository.count(where),
 		]);
@@ -68,9 +73,9 @@ export const recordService = {
 			items,
 			meta: {
 				total,
-				page: query.page,
-				limit: query.limit,
-				totalPages: Math.ceil(total / query.limit),
+				page,
+				limit,
+				totalPages: Math.ceil(total / limit),
 			},
 		};
 	},

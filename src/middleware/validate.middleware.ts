@@ -27,7 +27,12 @@ export function validate(config: ValidateConfig) {
 					new AppError("Validation failed", 400, "VALIDATION_ERROR", parsedQuery.error.flatten()),
 				);
 			}
-			req.query = parsedQuery.data as Request["query"];
+
+			Object.defineProperty(req, "query", {
+				value: parsedQuery.data as Request["query"],
+				writable: true,
+				configurable: true,
+			});
 		}
 
 		if (config.params) {
@@ -37,7 +42,12 @@ export function validate(config: ValidateConfig) {
 					new AppError("Validation failed", 400, "VALIDATION_ERROR", parsedParams.error.flatten()),
 				);
 			}
-			req.params = parsedParams.data as Request["params"];
+
+			Object.defineProperty(req, "params", {
+				value: parsedParams.data as Request["params"],
+				writable: true,
+				configurable: true,
+			});
 		}
 
 		return next();

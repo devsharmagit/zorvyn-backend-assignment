@@ -2,7 +2,7 @@ import * as z from "zod";
 import { RecordType } from "../generated/prisma/enums.js";
 
 export const createRecordSchema = z.object({
-	amount: z.coerce.number().finite(),
+	amount: z.coerce.number().finite().positive(),
 	type: z.enum(RecordType),
 	category: z.string().trim().min(1),
 	date: z.coerce.date(),
@@ -11,7 +11,7 @@ export const createRecordSchema = z.object({
 
 export const updateRecordSchema = z
 	.object({
-		amount: z.coerce.number().finite().optional(),
+		amount: z.coerce.number().finite().positive().optional(),
 		type: z.enum(RecordType).optional(),
 		category: z.string().trim().min(1).optional(),
 		date: z.coerce.date().optional(),
