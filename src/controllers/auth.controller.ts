@@ -1,42 +1,35 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import {
 	authService,
 	DuplicateEmailError,
 	InvalidCredentialsError,
 } from "../services/auth.service.js";
+import { AppError } from "../utils/app-error.js";
 
 export const authController = {
-	async register(req: Request, res: Response) {
+	async register(req: Request, res: Response, next: NextFunction) {
 		try {
 			const result = await authService.register(req.body);
 			return res.status(201).json(result);
 		} catch (error) {
 			if (error instanceof DuplicateEmailError) {
-				return res.status(409).json({
-					message: error.message,
-				});
+				return next(new AppError(error.message, 409, "DUPLICATE_EMAIL"));
 			}
 
-			return res.status(500).json({
-				message: "Internal server error",
-			});
+			return next(error);
 		}
 	},
 
-	async login(req: Request, res: Response) {
+	async login(req: Request, res: Response, next: NextFunction) {
 		try {
 			const result = await authService.login(req.body);
 			return res.status(200).json(result);
 		} catch (error) {
 			if (error instanceof InvalidCredentialsError) {
-				return res.status(401).json({
-					message: error.message,
-				});
+				return next(new AppError(error.message, 401, "INVALID_CREDENTIALS"));
 			}
 
-			return res.status(500).json({
-				message: "Internal server error",
-			});
+			return next(error);
 		}
 	},
 };

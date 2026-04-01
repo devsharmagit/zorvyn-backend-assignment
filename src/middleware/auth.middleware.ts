@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { Role } from "../generated/prisma/enums.js";
 import { env } from "../env.js";
+import { AppError } from "../utils/app-error.js";
 
 type AuthTokenPayload = {
 	userId: string;
@@ -40,14 +41,14 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
 	const token = extractBearerToken(req.header("authorization"));
 
 	if (!token) {
-		return res.status(401).json({ message: "Missing token" });
+		return next(new AppError("Missing token", 401, "AUTH_TOKEN_MISSING"));
 	}
 
 	try {
 		const decoded = jwt.verify(token, env.JWT_SECRET);
 
 		if (!isAuthTokenPayload(decoded)) {
-			return res.status(401).json({ message: "Invalid token" });
+			return next(new AppError("Invalid token", 401, "AUTH_TOKEN_INVALID"));
 		}
 
 		req.user = {
@@ -58,21 +59,21 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
 		return next();
 	} catch (error) {
 		if (error instanceof JsonWebTokenError || error instanceof TokenExpiredError) {
-			return res.status(401).json({ message: "Invalid token" });
+			return next(new AppError("Invalid token", 401, "AUTH_TOKEN_INVALID"));
 		}
 
-		return res.status(500).json({ message: "Internal server error" });
+		return next(error);
 	}
 }
 
 export function authorize(allowedRoles: Role[]) {
 	return (req: Request, res: Response, next: NextFunction) => {
 		if (!req.user) {
-			return res.status(401).json({ message: "Missing token" });
+			return next(new AppError("Missing token", 401, "AUTH_TOKEN_MISSING"));
 		}
 
 		if (!allowedRoles.includes(req.user.role)) {
-			return res.status(403).json({ message: "Forbidden" });
+			return next(new AppError("Forbidden", 403, "FORBIDDEN"));
 		}
 
 		return next();
