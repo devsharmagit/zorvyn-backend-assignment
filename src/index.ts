@@ -1,1 +1,8 @@
-console.log("hello world12121")
+import { app } from "./app.js";
+import { env } from "./env.js";
+
+const port = Number(env.PORT);
+
+app.listen(port, () => {
+	console.log(`Server is running on port ${port}`);
+});
