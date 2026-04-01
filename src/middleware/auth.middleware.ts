@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
-import type { Role } from "../generated/prisma/enums.js";
+import { Role } from "../generated/prisma/enums.js";
 import { env } from "../env.js";
 
 type AuthTokenPayload = {
@@ -30,7 +30,9 @@ function isAuthTokenPayload(payload: unknown): payload is AuthTokenPayload {
 	const candidate = payload as Record<string, unknown>;
 	return (
 		typeof candidate.userId === "string" &&
-		(candidate.role === "USER" || candidate.role === "ADMIN")
+		(candidate.role === Role.USER ||
+			candidate.role === Role.ADMIN ||
+			candidate.role === Role.ANALYST)
 	);
 }
 

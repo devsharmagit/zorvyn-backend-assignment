@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { env } from "../env.js";
+import type { Role } from "../generated/prisma/enums.js";
 import { authRepository } from "../repositories/auth.repository.js";
 import type { LoginInput, RegisterInput } from "../schemas/auth.schema.js";
 
@@ -29,7 +30,7 @@ type RegisterResult = {
 	};
 };
 
-function signAuthToken(userId: string, role: string) {
+function signAuthToken(userId: string, role: Role) {
 	return jwt.sign({ userId, role }, env.JWT_SECRET, { expiresIn: "1h" });
 }
 
