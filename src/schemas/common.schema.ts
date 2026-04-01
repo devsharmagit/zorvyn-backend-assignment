@@ -1,0 +1,3 @@
+import * as z from "zod";
+
+export const emptyQuerySchema = z.object({}).passthrough();

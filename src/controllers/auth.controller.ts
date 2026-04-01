@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import { loginSchema, registerSchema } from "../schemas/auth.schema.js";
 import {
 	authService,
 	DuplicateEmailError,
@@ -8,17 +7,8 @@ import {
 
 export const authController = {
 	async register(req: Request, res: Response) {
-		const parsed = registerSchema.safeParse(req.body);
-
-		if (!parsed.success) {
-			return res.status(400).json({
-				message: "Validation failed",
-				errors: parsed.error.flatten(),
-			});
-		}
-
 		try {
-			const result = await authService.register(parsed.data);
+			const result = await authService.register(req.body);
 			return res.status(201).json(result);
 		} catch (error) {
 			if (error instanceof DuplicateEmailError) {
@@ -34,17 +24,8 @@ export const authController = {
 	},
 
 	async login(req: Request, res: Response) {
-		const parsed = loginSchema.safeParse(req.body);
-
-		if (!parsed.success) {
-			return res.status(400).json({
-				message: "Validation failed",
-				errors: parsed.error.flatten(),
-			});
-		}
-
 		try {
-			const result = await authService.login(parsed.data);
+			const result = await authService.login(req.body);
 			return res.status(200).json(result);
 		} catch (error) {
 			if (error instanceof InvalidCredentialsError) {

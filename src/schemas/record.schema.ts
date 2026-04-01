@@ -32,6 +32,10 @@ export const getRecordsQuerySchema = z.object({
 	order: z.enum(["asc", "desc"]).default("desc"),
 });
 
+export const recordIdParamSchema = z.object({
+	id: z.string().trim().min(1),
+});
+
 export type CreateRecordInput = z.infer<typeof createRecordSchema>;
 export type UpdateRecordInput = z.infer<typeof updateRecordSchema>;
 export type GetRecordsQueryInput = z.infer<typeof getRecordsQuerySchema>;

@@ -9,5 +9,9 @@ export const updateUserStatusSchema = z.object({
 	isActive: z.boolean(),
 });
 
+export const userIdParamSchema = z.object({
+	id: z.string().trim().min(1),
+});
+
 export type UpdateUserRoleInput = z.infer<typeof updateUserRoleSchema>;
 export type UpdateUserStatusInput = z.infer<typeof updateUserStatusSchema>;
