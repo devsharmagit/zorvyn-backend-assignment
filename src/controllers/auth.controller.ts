@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+import { Prisma } from "../generated/prisma/client.js";
 import {
 	authService,
 	DuplicateEmailError,
@@ -14,6 +15,13 @@ export const authController = {
 		} catch (error) {
 			if (error instanceof DuplicateEmailError) {
 				return next(new AppError(error.message, 409, "DUPLICATE_EMAIL"));
+			}
+
+			if (
+				error instanceof Prisma.PrismaClientKnownRequestError &&
+				error.code === "P2002"
+			) {
+				return next(new AppError("Email is already registered", 409, "DUPLICATE_EMAIL"));
 			}
 
 			return next(error);

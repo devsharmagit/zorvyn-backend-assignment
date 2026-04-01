@@ -30,7 +30,15 @@ export const getRecordsQuerySchema = z.object({
 	limit: z.coerce.number().int().min(1).max(100).default(10),
 	sortBy: z.enum(["date", "amount"]).default("date"),
 	order: z.enum(["asc", "desc"]).default("desc"),
-});
+})
+	.strict()
+	.refine(
+		(data) => !data.startDate || !data.endDate || data.startDate <= data.endDate,
+		{
+			message: "startDate must be before or equal to endDate",
+			path: ["startDate"],
+		},
+	);
 
 export const recordIdParamSchema = z.object({
 	id: z.string().trim().min(1),

@@ -1,3 +1,3 @@
 import * as z from "zod";
 
-export const emptyQuerySchema = z.object({}).passthrough();
+export const emptyQuerySchema = z.object({}).strict();
