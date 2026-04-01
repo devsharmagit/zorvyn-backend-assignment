@@ -15,6 +15,12 @@ export const authRepository = {
 		});
 	},
 
+	findUserById(id: string) {
+		return prisma.user.findUnique({
+			where: { id },
+		});
+	},
+
 	createUser(data: CreateUserInput) {
 		return prisma.user.create({
 			data,

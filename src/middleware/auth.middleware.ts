@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { Role } from "../generated/prisma/enums.js";
+import { authRepository } from "../repositories/auth.repository.js";
 import { env } from "../env.js";
 import { AppError } from "../utils/app-error.js";
 import pkg from 'jsonwebtoken';
@@ -39,7 +40,7 @@ function isAuthTokenPayload(payload: unknown): payload is AuthTokenPayload {
 	);
 }
 
-export function authenticate(req: Request, res: Response, next: NextFunction) {
+export async function authenticate(req: Request, res: Response, next: NextFunction) {
 	const token = extractBearerToken(req.header("authorization"));
 
 	if (!token) {
@@ -53,9 +54,14 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
 			return next(new AppError("Invalid token", 401, "AUTH_TOKEN_INVALID"));
 		}
 
+		const user = await authRepository.findUserById(decoded.userId);
+		if (!user || !user.isActive) {
+			return next(new AppError("Invalid token", 401, "AUTH_TOKEN_INVALID"));
+		}
+
 		req.user = {
-			userId: decoded.userId,
-			role: decoded.role,
+			userId: user.id,
+			role: user.role,
 		};
 
 		return next();

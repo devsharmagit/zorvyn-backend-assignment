@@ -3,6 +3,7 @@ import { Prisma } from "../generated/prisma/client.js";
 import {
 	authService,
 	DuplicateEmailError,
+	InactiveUserError,
 	InvalidCredentialsError,
 } from "../services/auth.service.js";
 import { AppError } from "../utils/app-error.js";
@@ -43,6 +44,10 @@ export const authController = {
 		} catch (error) {
 			if (error instanceof InvalidCredentialsError) {
 				return next(new AppError(error.message, 401, "INVALID_CREDENTIALS"));
+			}
+
+			if (error instanceof InactiveUserError) {
+				return next(new AppError(error.message, 403, "USER_INACTIVE"));
 			}
 
 			return next(error);

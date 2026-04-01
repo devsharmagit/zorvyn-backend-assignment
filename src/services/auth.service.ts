@@ -19,6 +19,13 @@ export class InvalidCredentialsError extends Error {
 	}
 }
 
+export class InactiveUserError extends Error {
+	constructor() {
+		super("User account is inactive");
+		this.name = "InactiveUserError";
+	}
+}
+
 type RegisterResult = {
 	token: string;
 	user: {
@@ -76,6 +83,10 @@ export const authService = {
 
 		if (!isPasswordValid) {
 			throw new InvalidCredentialsError();
+		}
+
+		if (!user.isActive) {
+			throw new InactiveUserError();
 		}
 
 		const token = signAuthToken(user.id, user.role);
