@@ -20,7 +20,11 @@ app.use("/dashboard", dashboardRoutes);
 app.use("/users", userRoutes);
 
 app.get("/health", (_req, res) => {
-	res.status(200).json({ status: "ok" });
+	res.status(200).json({
+		success: true,
+		message: "Health check successful",
+		data: { status: "ok" },
+	});
 });
 
 app.use(notFoundHandler);

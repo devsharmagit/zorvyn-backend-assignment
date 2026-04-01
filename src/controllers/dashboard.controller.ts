@@ -5,7 +5,11 @@ export const dashboardController = {
 	async getSummary(_req: Request, res: Response, next: NextFunction) {
 		try {
 			const summary = await dashboardService.getSummary();
-			return res.status(200).json(summary);
+			return res.status(200).json({
+				success: true,
+				message: "Dashboard summary fetched successfully",
+				data: summary,
+			});
 		} catch (error) {
 			return next(error);
 		}
@@ -14,7 +18,11 @@ export const dashboardController = {
 	async getByCategory(_req: Request, res: Response, next: NextFunction) {
 		try {
 			const result = await dashboardService.getByCategory();
-			return res.status(200).json(result);
+			return res.status(200).json({
+				success: true,
+				message: "Category breakdown fetched successfully",
+				data: result,
+			});
 		} catch (error) {
 			return next(error);
 		}
@@ -23,7 +31,11 @@ export const dashboardController = {
 	async getMonthlyTrends(_req: Request, res: Response, next: NextFunction) {
 		try {
 			const trends = await dashboardService.getMonthlyTrends();
-			return res.status(200).json(trends);
+			return res.status(200).json({
+				success: true,
+				message: "Monthly trends fetched successfully",
+				data: trends,
+			});
 		} catch (error) {
 			return next(error);
 		}
@@ -32,7 +44,11 @@ export const dashboardController = {
 	async getRecent(_req: Request, res: Response, next: NextFunction) {
 		try {
 			const recent = await dashboardService.getRecent();
-			return res.status(200).json(recent);
+			return res.status(200).json({
+				success: true,
+				message: "Recent records fetched successfully",
+				data: recent,
+			});
 		} catch (error) {
 			return next(error);
 		}

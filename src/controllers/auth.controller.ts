@@ -11,7 +11,11 @@ export const authController = {
 	async register(req: Request, res: Response, next: NextFunction) {
 		try {
 			const result = await authService.register(req.body);
-			return res.status(201).json(result);
+			return res.status(201).json({
+				success: true,
+				message: "User registered successfully",
+				data: result,
+			});
 		} catch (error) {
 			if (error instanceof DuplicateEmailError) {
 				return next(new AppError(error.message, 409, "DUPLICATE_EMAIL"));
@@ -31,7 +35,11 @@ export const authController = {
 	async login(req: Request, res: Response, next: NextFunction) {
 		try {
 			const result = await authService.login(req.body);
-			return res.status(200).json(result);
+			return res.status(200).json({
+				success: true,
+				message: "Login successful",
+				data: result,
+			});
 		} catch (error) {
 			if (error instanceof InvalidCredentialsError) {
 				return next(new AppError(error.message, 401, "INVALID_CREDENTIALS"));

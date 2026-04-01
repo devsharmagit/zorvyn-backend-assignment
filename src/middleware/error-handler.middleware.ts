@@ -15,9 +15,9 @@ export function globalErrorHandler(
 	if (error instanceof ZodError) {
 		return res.status(400).json({
 			success: false,
-			error: {
+			message: "Validation failed",
+			data: {
 				code: "VALIDATION_ERROR",
-				message: "Validation failed",
 				details: error.flatten(),
 			},
 		});
@@ -26,20 +26,20 @@ export function globalErrorHandler(
 	if (error instanceof AppError) {
 		return res.status(error.statusCode).json({
 			success: false,
-			error: {
+			message: error.message,
+			data: {
 				code: error.code,
-				message: error.message,
 				...(error.details !== undefined ? { details: error.details } : {}),
 			},
 		});
 	}
-	console.log(error)
+	console.log(error);
 
 	return res.status(500).json({
 		success: false,
-		error: {
+		message: "Internal server error",
+		data: {
 			code: "INTERNAL_SERVER_ERROR",
-			message: "Internal server error",
 		},
 	});
 }
