@@ -1,0 +1,1311 @@
+{
+	"info": {
+		"_postman_id": "zorvyn-backend-api-collection",
+		"name": "Zorvyn Backend API",
+		"description": "Complete API collection for the Zorvyn Backend Assignment — an Express.js + TypeScript financial records management system.\n\nBase URL is configurable via the `{{base_url}}` variable.\nAuthentication uses Bearer tokens stored in the `{{token}}` variable (auto-set on login).\n\nRoles:\n- **ADMIN**: Full access to all endpoints including user management.\n- **ANALYST**: Read-only access to records and dashboard.\n- **USER**: Default role with no API access beyond auth.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "record_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"description": "Authentication endpoints for user registration and login. No Bearer token required.",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Dev Sharma\",\n\t\"email\": \"dev@example.com\",\n\t\"password\": \"Password@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						},
+						"description": "Register a new user account.\n\n**Validation:**\n- `name`: string, min 2 characters\n- `email`: valid email format\n- `password`: string, min 8 characters\n\nNew users are assigned the `USER` role by default."
+					},
+					"response": [
+						{
+							"name": "201 — User Registered Successfully",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Dev Sharma\",\n\t\"email\": \"dev@example.com\",\n\t\"password\": \"Password@123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/register",
+									"host": ["{{base_url}}"],
+									"path": ["auth", "register"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"User registered successfully\",\n\t\"data\": {\n\t\t\"id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n\t\t\"name\": \"Dev Sharma\",\n\t\t\"email\": \"dev@example.com\",\n\t\t\"role\": \"USER\",\n\t\t\"isActive\": true,\n\t\t\"createdAt\": \"2026-04-02T06:00:00.000Z\"\n\t}\n}"
+						},
+						{
+							"name": "409 — Duplicate Email",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Dev Sharma\",\n\t\"email\": \"dev@example.com\",\n\t\"password\": \"Password@123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/register",
+									"host": ["{{base_url}}"],
+									"path": ["auth", "register"]
+								}
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": false,\n\t\"message\": \"Email is already registered\",\n\t\"data\": null\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success');",
+									"    pm.expect(json.success).to.be.a('boolean');",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json.data).to.be.an('object');",
+									"});",
+									"",
+									"pm.test('User data contains expected fields', function () {",
+									"    const data = pm.response.json().data;",
+									"    pm.expect(data).to.have.property('id');",
+									"    pm.expect(data).to.have.property('name');",
+									"    pm.expect(data).to.have.property('email');",
+									"    pm.expect(data).to.have.property('role');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"dev@example.com\",\n\t\"password\": \"Password@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Authenticate a user and receive a JWT Bearer token.\n\nThe token is automatically stored in the `{{token}}` environment variable via the Tests script.\n\n**Validation:**\n- `email`: valid email format\n- `password`: string, min 1 character"
+					},
+					"response": [
+						{
+							"name": "200 — Login Successful",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"email\": \"dev@example.com\",\n\t\"password\": \"Password@123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/login",
+									"host": ["{{base_url}}"],
+									"path": ["auth", "login"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"Login successful\",\n\t\"data\": {\n\t\t\"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhMWIyYzNkNC1lNWY2LTc4OTAtYWJjZC1lZjEyMzQ1Njc4OTAiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NzUxMTM5NzN9.sample_signature\",\n\t\t\"user\": {\n\t\t\t\"id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n\t\t\t\"name\": \"Admin User\",\n\t\t\t\"email\": \"admin@zorvyn.local\",\n\t\t\t\"role\": \"ADMIN\",\n\t\t\t\"createdAt\": \"2026-04-02T06:00:00.000Z\"\n\t\t}\n\t}\n}"
+						},
+						{
+							"name": "401 — Invalid Credentials",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"email\": \"dev@example.com\",\n\t\"password\": \"WrongPassword\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/login",
+									"host": ["{{base_url}}"],
+									"path": ["auth", "login"]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": false,\n\t\"message\": \"Invalid email or password\",\n\t\"data\": null\n}"
+						},
+						{
+							"name": "403 — Inactive User",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"email\": \"inactive@example.com\",\n\t\"password\": \"Password@123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/login",
+									"host": ["{{base_url}}"],
+									"path": ["auth", "login"]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": false,\n\t\"message\": \"User account is inactive\",\n\t\"data\": null\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success');",
+									"    pm.expect(json.success).to.be.a('boolean');",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json.data).to.be.an('object');",
+									"});",
+									"",
+									"pm.test('Token is present and stored', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.data).to.have.property('token');",
+									"    pm.expect(json.data).to.have.property('user');",
+									"    pm.expect(json.data.token).to.be.a('string').and.not.empty;",
+									"    // Store in both environment and collection variables for reliability",
+									"    pm.collectionVariables.set('token', json.data.token);",
+									"    if (pm.environment.name) { pm.environment.set('token', json.data.token); }",
+									"    pm.variables.set('token', json.data.token);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Records",
+			"description": "Financial record CRUD endpoints.\n\n- **ADMIN**: Full CRUD (create, read, update, delete)\n- **ANALYST**: Read-only (list all, get by ID)\n\nAll endpoints require Bearer token authentication.",
+			"item": [
+				{
+					"name": "Create Record",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"amount\": 15000.50,\n\t\"type\": \"INCOME\",\n\t\"category\": \"Salary\",\n\t\"date\": \"2026-04-01T00:00:00.000Z\",\n\t\"notes\": \"April 2026 salary payment\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/records",
+							"host": ["{{base_url}}"],
+							"path": ["records"]
+						},
+						"description": "Create a new financial record.\n\n**Role Required:** ADMIN\n\n**Validation:**\n- `amount`: positive number\n- `type`: `INCOME` or `EXPENSE`\n- `category`: non-empty string\n- `date`: valid date\n- `notes`: optional string"
+					},
+					"response": [
+						{
+							"name": "201 — Record Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"amount\": 15000.50,\n\t\"type\": \"INCOME\",\n\t\"category\": \"Salary\",\n\t\"date\": \"2026-04-01T00:00:00.000Z\",\n\t\"notes\": \"April 2026 salary payment\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/records",
+									"host": ["{{base_url}}"],
+									"path": ["records"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"Record created successfully\",\n\t\"data\": {\n\t\t\"id\": \"b2c3d4e5-f6a7-8901-bcde-f23456789012\",\n\t\t\"amount\": 15000.50,\n\t\t\"type\": \"INCOME\",\n\t\t\"category\": \"Salary\",\n\t\t\"date\": \"2026-04-01T00:00:00.000Z\",\n\t\t\"notes\": \"April 2026 salary payment\",\n\t\t\"createdBy\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n\t\t\"createdAt\": \"2026-04-02T06:10:00.000Z\",\n\t\t\"updatedAt\": \"2026-04-02T06:10:00.000Z\",\n\t\t\"deletedAt\": null\n\t}\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json.data).to.be.an('object');",
+									"});",
+									"",
+									"pm.test('Record data has expected fields', function () {",
+									"    const data = pm.response.json().data;",
+									"    pm.expect(data).to.have.property('id');",
+									"    pm.expect(data).to.have.property('amount');",
+									"    pm.expect(data).to.have.property('type');",
+									"    pm.expect(data).to.have.property('category');",
+									"    pm.expect(data).to.have.property('date');",
+									"    pm.collectionVariables.set('record_id', data.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get All Records",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/records?page=1&limit=10&sortBy=date&order=desc",
+							"host": ["{{base_url}}"],
+							"path": ["records"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number (default: 1)"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Items per page, max 100 (default: 10)"
+								},
+								{
+									"key": "sortBy",
+									"value": "date",
+									"description": "Sort field: 'date' or 'amount' (default: date)"
+								},
+								{
+									"key": "order",
+									"value": "desc",
+									"description": "Sort order: 'asc' or 'desc' (default: desc)"
+								},
+								{
+									"key": "type",
+									"value": "INCOME",
+									"description": "Filter by type: INCOME or EXPENSE",
+									"disabled": true
+								},
+								{
+									"key": "category",
+									"value": "Salary",
+									"description": "Filter by category name",
+									"disabled": true
+								},
+								{
+									"key": "startDate",
+									"value": "2026-01-01",
+									"description": "Filter records from this date",
+									"disabled": true
+								},
+								{
+									"key": "endDate",
+									"value": "2026-12-31",
+									"description": "Filter records until this date",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieve all financial records with optional filtering, pagination, and sorting.\n\n**Roles Required:** ADMIN, ANALYST\n\n**Query Parameters:**\n- `page` (default: 1)\n- `limit` (default: 10, max: 100)\n- `sortBy`: `date` | `amount` (default: date)\n- `order`: `asc` | `desc` (default: desc)\n- `type`: `INCOME` | `EXPENSE` (optional filter)\n- `category`: string (optional filter)\n- `startDate`: date (optional filter)\n- `endDate`: date (optional filter, must be >= startDate)"
+					},
+					"response": [
+						{
+							"name": "200 — Records Fetched",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/records?page=1&limit=10&sortBy=date&order=desc",
+									"host": ["{{base_url}}"],
+									"path": ["records"],
+									"query": [
+										{ "key": "page", "value": "1" },
+										{ "key": "limit", "value": "10" },
+										{ "key": "sortBy", "value": "date" },
+										{ "key": "order", "value": "desc" }
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"Records fetched successfully\",\n\t\"data\": {\n\t\t\"records\": [\n\t\t\t{\n\t\t\t\t\"id\": \"b2c3d4e5-f6a7-8901-bcde-f23456789012\",\n\t\t\t\t\"amount\": 15000.50,\n\t\t\t\t\"type\": \"INCOME\",\n\t\t\t\t\"category\": \"Salary\",\n\t\t\t\t\"date\": \"2026-04-01T00:00:00.000Z\",\n\t\t\t\t\"notes\": \"April 2026 salary payment\",\n\t\t\t\t\"createdBy\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n\t\t\t\t\"createdAt\": \"2026-04-02T06:10:00.000Z\",\n\t\t\t\t\"updatedAt\": \"2026-04-02T06:10:00.000Z\",\n\t\t\t\t\"deletedAt\": null\n\t\t\t}\n\t\t],\n\t\t\"pagination\": {\n\t\t\t\"page\": 1,\n\t\t\t\"limit\": 10,\n\t\t\t\"total\": 1,\n\t\t\t\"totalPages\": 1\n\t\t}\n\t}\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json.data).to.be.an('object');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Record by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/records/{{record_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["records", "{{record_id}}"]
+						},
+						"description": "Retrieve a single financial record by its ID.\n\n**Roles Required:** ADMIN, ANALYST\n\n**Path Parameters:**\n- `id`: UUID of the record"
+					},
+					"response": [
+						{
+							"name": "200 — Record Fetched",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/records/{{record_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["records", "{{record_id}}"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"Record fetched successfully\",\n\t\"data\": {\n\t\t\"id\": \"b2c3d4e5-f6a7-8901-bcde-f23456789012\",\n\t\t\"amount\": 15000.50,\n\t\t\"type\": \"INCOME\",\n\t\t\"category\": \"Salary\",\n\t\t\"date\": \"2026-04-01T00:00:00.000Z\",\n\t\t\"notes\": \"April 2026 salary payment\",\n\t\t\"createdBy\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n\t\t\"createdAt\": \"2026-04-02T06:10:00.000Z\",\n\t\t\"updatedAt\": \"2026-04-02T06:10:00.000Z\",\n\t\t\"deletedAt\": null\n\t}\n}"
+						},
+						{
+							"name": "404 — Record Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/records/nonexistent-id",
+									"host": ["{{base_url}}"],
+									"path": ["records", "nonexistent-id"]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": false,\n\t\"message\": \"Record not found\",\n\t\"data\": null\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json.data).to.be.an('object');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Update Record",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"amount\": 16000.00,\n\t\"notes\": \"Updated: April 2026 salary with bonus\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/records/{{record_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["records", "{{record_id}}"]
+						},
+						"description": "Update an existing financial record. At least one field must be provided.\n\n**Role Required:** ADMIN\n\n**Path Parameters:**\n- `id`: UUID of the record\n\n**Optional Fields:**\n- `amount`: positive number\n- `type`: `INCOME` or `EXPENSE`\n- `category`: non-empty string\n- `date`: valid date\n- `notes`: string"
+					},
+					"response": [
+						{
+							"name": "200 — Record Updated",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"amount\": 16000.00,\n\t\"notes\": \"Updated: April 2026 salary with bonus\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/records/{{record_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["records", "{{record_id}}"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"Record updated successfully\",\n\t\"data\": {\n\t\t\"id\": \"b2c3d4e5-f6a7-8901-bcde-f23456789012\",\n\t\t\"amount\": 16000.00,\n\t\t\"type\": \"INCOME\",\n\t\t\"category\": \"Salary\",\n\t\t\"date\": \"2026-04-01T00:00:00.000Z\",\n\t\t\"notes\": \"Updated: April 2026 salary with bonus\",\n\t\t\"createdBy\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n\t\t\"createdAt\": \"2026-04-02T06:10:00.000Z\",\n\t\t\"updatedAt\": \"2026-04-02T06:15:00.000Z\",\n\t\t\"deletedAt\": null\n\t}\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json.data).to.be.an('object');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Delete Record",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/records/{{record_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["records", "{{record_id}}"]
+						},
+						"description": "Soft-delete a financial record by its ID.\n\n**Role Required:** ADMIN\n\n**Path Parameters:**\n- `id`: UUID of the record"
+					},
+					"response": [
+						{
+							"name": "200 — Record Deleted",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/records/{{record_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["records", "{{record_id}}"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"Record deleted successfully\",\n\t\"data\": null\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"description": "Dashboard analytics endpoints for financial data visualization.\n\n**Roles Required:** ADMIN, ANALYST\n\nAll endpoints require Bearer token authentication.",
+			"item": [
+				{
+					"name": "Get Summary",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/dashboard/summary",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "summary"]
+						},
+						"description": "Get a high-level summary of all financial data including total income, expenses, and net balance.\n\n**Roles Required:** ADMIN, ANALYST"
+					},
+					"response": [
+						{
+							"name": "200 — Summary Fetched",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/dashboard/summary",
+									"host": ["{{base_url}}"],
+									"path": ["dashboard", "summary"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"Dashboard summary fetched successfully\",\n\t\"data\": {\n\t\t\"totalIncome\": 45000.00,\n\t\t\"totalExpense\": 12500.75,\n\t\t\"netBalance\": 32499.25,\n\t\t\"totalRecords\": 25\n\t}\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json.data).to.be.an('object');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get By Category",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/dashboard/by-category",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "by-category"]
+						},
+						"description": "Get financial data grouped by category.\n\n**Roles Required:** ADMIN, ANALYST"
+					},
+					"response": [
+						{
+							"name": "200 — Category Breakdown Fetched",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/dashboard/by-category",
+									"host": ["{{base_url}}"],
+									"path": ["dashboard", "by-category"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"Category breakdown fetched successfully\",\n\t\"data\": [\n\t\t{\n\t\t\t\"category\": \"Salary\",\n\t\t\t\"totalAmount\": 45000.00,\n\t\t\t\"count\": 3\n\t\t},\n\t\t{\n\t\t\t\"category\": \"Rent\",\n\t\t\t\"totalAmount\": 8000.00,\n\t\t\t\"count\": 2\n\t\t},\n\t\t{\n\t\t\t\"category\": \"Utilities\",\n\t\t\t\"totalAmount\": 4500.75,\n\t\t\t\"count\": 5\n\t\t}\n\t]\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Monthly Trends",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/dashboard/monthly-trends",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "monthly-trends"]
+						},
+						"description": "Get monthly income and expense trends over time.\n\n**Roles Required:** ADMIN, ANALYST"
+					},
+					"response": [
+						{
+							"name": "200 — Monthly Trends Fetched",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/dashboard/monthly-trends",
+									"host": ["{{base_url}}"],
+									"path": ["dashboard", "monthly-trends"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"Monthly trends fetched successfully\",\n\t\"data\": [\n\t\t{\n\t\t\t\"month\": \"2026-01\",\n\t\t\t\"income\": 15000.00,\n\t\t\t\"expense\": 4200.50\n\t\t},\n\t\t{\n\t\t\t\"month\": \"2026-02\",\n\t\t\t\"income\": 15000.00,\n\t\t\t\"expense\": 3800.25\n\t\t},\n\t\t{\n\t\t\t\"month\": \"2026-03\",\n\t\t\t\"income\": 15000.00,\n\t\t\t\"expense\": 4500.00\n\t\t}\n\t]\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Recent Records",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/dashboard/recent",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "recent"]
+						},
+						"description": "Get the most recent financial records.\n\n**Roles Required:** ADMIN, ANALYST"
+					},
+					"response": [
+						{
+							"name": "200 — Recent Records Fetched",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/dashboard/recent",
+									"host": ["{{base_url}}"],
+									"path": ["dashboard", "recent"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"Recent records fetched successfully\",\n\t\"data\": [\n\t\t{\n\t\t\t\"id\": \"b2c3d4e5-f6a7-8901-bcde-f23456789012\",\n\t\t\t\"amount\": 15000.50,\n\t\t\t\"type\": \"INCOME\",\n\t\t\t\"category\": \"Salary\",\n\t\t\t\"date\": \"2026-04-01T00:00:00.000Z\",\n\t\t\t\"notes\": \"April 2026 salary payment\",\n\t\t\t\"createdAt\": \"2026-04-02T06:10:00.000Z\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"c3d4e5f6-a7b8-9012-cdef-345678901234\",\n\t\t\t\"amount\": 2500.00,\n\t\t\t\"type\": \"EXPENSE\",\n\t\t\t\"category\": \"Rent\",\n\t\t\t\"date\": \"2026-03-28T00:00:00.000Z\",\n\t\t\t\"notes\": \"March rent payment\",\n\t\t\t\"createdAt\": \"2026-03-28T09:00:00.000Z\"\n\t\t}\n\t]\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"description": "User management endpoints.\n\n**Role Required:** ADMIN only\n\nAll endpoints require Bearer token authentication.",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": ["{{base_url}}"],
+							"path": ["users"]
+						},
+						"description": "Retrieve a list of all users in the system.\n\n**Role Required:** ADMIN"
+					},
+					"response": [
+						{
+							"name": "200 — Users Fetched",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/users",
+									"host": ["{{base_url}}"],
+									"path": ["users"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"Users fetched successfully\",\n\t\"data\": [\n\t\t{\n\t\t\t\"id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n\t\t\t\"name\": \"Dev Sharma\",\n\t\t\t\"email\": \"dev@example.com\",\n\t\t\t\"role\": \"ADMIN\",\n\t\t\t\"isActive\": true,\n\t\t\t\"createdAt\": \"2026-04-02T06:00:00.000Z\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"d4e5f6a7-b8c9-0123-defg-456789012345\",\n\t\t\t\"name\": \"Priya Patel\",\n\t\t\t\"email\": \"priya@example.com\",\n\t\t\t\"role\": \"ANALYST\",\n\t\t\t\"isActive\": true,\n\t\t\t\"createdAt\": \"2026-04-02T06:05:00.000Z\"\n\t\t}\n\t]\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"});",
+									"",
+									"pm.test('Store first user ID', function () {",
+									"    const data = pm.response.json().data;",
+									"    if (Array.isArray(data) && data.length > 0) {",
+									"        pm.collectionVariables.set('user_id', data[0].id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Update User Role",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"role\": \"ANALYST\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}/role",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}", "role"]
+						},
+						"description": "Update a user's role.\n\n**Role Required:** ADMIN\n\n**Path Parameters:**\n- `id`: UUID of the user\n\n**Body:**\n- `role`: `USER` | `ADMIN` | `ANALYST`"
+					},
+					"response": [
+						{
+							"name": "200 — Role Updated",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"role\": \"ANALYST\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/users/{{user_id}}/role",
+									"host": ["{{base_url}}"],
+									"path": ["users", "{{user_id}}", "role"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"User role updated successfully\",\n\t\"data\": {\n\t\t\"id\": \"d4e5f6a7-b8c9-0123-defg-456789012345\",\n\t\t\"name\": \"Priya Patel\",\n\t\t\"email\": \"priya@example.com\",\n\t\t\"role\": \"ANALYST\",\n\t\t\"isActive\": true,\n\t\t\"createdAt\": \"2026-04-02T06:05:00.000Z\"\n\t}\n}"
+						},
+						{
+							"name": "404 — User Not Found",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"role\": \"ANALYST\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/users/nonexistent-id/role",
+									"host": ["{{base_url}}"],
+									"path": ["users", "nonexistent-id", "role"]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": false,\n\t\"message\": \"User not found\",\n\t\"data\": null\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json.data).to.be.an('object');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Update User Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"isActive\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}/status",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}", "status"]
+						},
+						"description": "Activate or deactivate a user account.\n\n**Role Required:** ADMIN\n\n**Path Parameters:**\n- `id`: UUID of the user\n\n**Body:**\n- `isActive`: boolean"
+					},
+					"response": [
+						{
+							"name": "200 — Status Updated",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"isActive\": false\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/users/{{user_id}}/status",
+									"host": ["{{base_url}}"],
+									"path": ["users", "{{user_id}}", "status"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"User status updated successfully\",\n\t\"data\": {\n\t\t\"id\": \"d4e5f6a7-b8c9-0123-defg-456789012345\",\n\t\t\"name\": \"Priya Patel\",\n\t\t\"email\": \"priya@example.com\",\n\t\t\"role\": \"ANALYST\",\n\t\t\"isActive\": false,\n\t\t\"createdAt\": \"2026-04-02T06:05:00.000Z\"\n\t}\n}"
+						}
+					],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('success', true);",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message).to.be.a('string');",
+									"    pm.expect(json).to.have.property('data');",
+									"    pm.expect(json.data).to.be.an('object');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}
